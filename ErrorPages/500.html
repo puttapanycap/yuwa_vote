@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+
+    <link href="../assets/css/fonts.css" rel="stylesheet" type="text/css" />
+    <link href="../css/custom.css" rel="stylesheet" type="text/css" />
+    <link href="./style.css" rel="stylesheet" type="text/css" />
+
+    <link rel="shortcut icon" href="./assets/medias/logos/favicon.ico" />
+    
+    <title>Error 500</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding-top: 100px;
+            padding-left: 50px;
+            padding-right: 50px;
+        }
+
+        .four_zero_four_bg {
+            background: url('https://work.ycap.go.th/assets/medias/gif/bg.gif');
+            height: 500px;
+            width: 100%;
+            background-position: top;
+            background-repeat: no-repeat;
+        }
+    </style>
+
+</head>
+
+<body>
+    <script>
+        var defaultThemeMode = "light";
+        var themeMode;
+        if (document.documentElement) {
+            if (document.documentElement.hasAttribute("data-bs-theme-mode")) {
+                themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
+            } else {
+                if (localStorage.getItem("data-bs-theme") !== null) {
+                    themeMode = localStorage.getItem("data-bs-theme");
+                } else {
+                    themeMode = defaultThemeMode;
+                }
+            }
+            if (themeMode === "system") {
+                themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+            document.documentElement.setAttribute("data-bs-theme", themeMode);
+        }
+    </script>
+    <section class="d-flex flex-column flex-center">
+        <div class="four_zero_four_bg">
+            <h1 class="text-center fs-7hx">500</h1>
+        </div>
+        <h1 class="text-center">500 Internal Server Error (พบข้อผิดพลาดภายในเซิร์ฟเวอร์)</h1>
+        <p>ไฟล์ระบบ หรือโฮสกำลังมีปัญหา ทำให้ไม่สามารถแสดงหน้าเว็บได้ ติดต่อแอดมิน หรือเจ้าของโฮสติ้ง</p>
+        <a class="btn btn-light btn-color-primary" href="../">ไปยังหน้าหลัก</a>
+    </section>
+</body>
+
+</html>
