@@ -104,49 +104,91 @@ function generateRememberKey()
     return $key;
 }
 
-function arrayToInsertSQL($tableName, $data)
+function arrayToInsertSQL($tableName, $data, $type = 'single')
 {
     // ตรวจสอบว่าข้อมูลไม่ว่างเปล่า
     if (empty($tableName) || empty($data) || !is_array($data)) {
-        throw new InvalidArgumentException("Invalid table name or data.");
+        return "Not Response";
     }
 
     // สร้างรายการคอลัมน์และค่าจาก Array
-    $columns = implode(", ", array_keys($data));
+    $columns = "";
 
     // สร้าง placeholders และตรวจสอบค่า null
     $placeholders = [];
+    $placeholders_final = "";
 
-    foreach ($data as $key => $value) {
-        if ($value === null) {
-            $placeholders[] = " 'NULL' ";
-        } else {
-            $placeholders[] = " '$value' ";
+    // Single
+    if ($type == 'single') :
+        $columns = implode(", ", array_keys($data));
+        foreach ($data as $key => $value) {
+            if ($value === null) {
+                $placeholders[] = " NULL ";
+            } else {
+                $placeholders[] = " '$value' ";
+            }
         }
-    }
+        // ใช้ implode เพื่อรวม placeholders
+        $placeholders_final = "(" . implode(", ", $placeholders) . ")";
 
-    // ใช้ implode เพื่อรวม placeholders
-    $placeholders = implode(", ", $placeholders);
+
+    // Multiple
+    elseif ($type == 'multi') :
+        foreach ($data as $key => $datas) {
+            $columns = implode(", ", array_keys($datas));
+            $values = [];
+            foreach ($datas as $value) {
+                if ($value === null) {
+                    $values[] = " NULL ";
+                } else {
+                    $values[] = " '$value' ";
+                }
+            }
+            $placeholders[] = "(" . implode(", ", $values) . ")";
+        }
+        $placeholders_final = implode(", ", $placeholders);
+    endif;
 
     // สร้างคำสั่ง SQL
-    $sql = "INSERT INTO $tableName ($columns) VALUES ($placeholders);";
+    $sql = "INSERT INTO $tableName ($columns) VALUES $placeholders_final;";
 
     return $sql;
 }
 
-
-function arrayToUpdateSQL($tableName, $data, $where)
+function arrayToUpdateSQL($tableName, $data, $where = [])
 {
     // ตรวจสอบข้อมูลเบื้องต้น
     if (empty($tableName) || empty($data) || !is_array($data) || empty($where)) {
         throw new InvalidArgumentException("Invalid table name, data, or where clause.");
     }
 
-    // สร้างส่วนของคอลัมน์สำหรับการอัปเดต
-    $setClause = implode(", ", array_map(fn($key) => "$key = :$key", array_keys($data)));
+    $set_sql = "";
+    $set_arr = [];
+    foreach ($data as $key => $value) {
+        
+        if ($value === null) {
+            $set_arr[] = " $key = NULL ";
+        } else {
+            $set_arr[] = " $key = '$value' ";
+        }
+    }
+    count($set_arr) > 0 ? $set_sql = implode(", ", $set_arr) : false;
+
+    $where_sql = "";
+    if (count($where) > 0) {
+        $where_arr = [];
+        foreach ($where as $key => $value) {
+            if ($value === null) {
+                $where_arr[] = " $key = NULL ";
+            } else {
+                $where_arr[] = " $key = '$value' ";
+            }
+        }
+        $where_sql = " WHERE " . implode(' AND ', $where_arr);
+    }
 
     // สร้างคำสั่ง SQL
-    $sql = "UPDATE $tableName SET $setClause WHERE $where;";
+    $sql = "UPDATE $tableName SET $set_sql $where_sql;";
 
     return $sql;
 }
@@ -229,4 +271,32 @@ function getAvatarImage($imageBlob)
     }
 
     return $act_img;
+}
+
+function generateTopicKey($length = 16) {
+    // Generate random bytes and convert to hexadecimal
+    return bin2hex(random_bytes($length / 2));
+}
+
+function setRememberKeyCookie($key, $value, $expiry = 2592000, $secure = true, $httpOnly = true) {
+    // Set cookie parameters
+    $cookieOptions = [
+        'expires' => time() + $expiry, // Current time + expiry duration
+        'path' => '/',                 // Available across the entire domain
+        'domain' => '',                // Default to the current domain
+        'secure' => $secure,           // Send only over HTTPS
+        'httponly' => $httpOnly,       // Accessible only via HTTP, not JavaScript
+        'samesite' => 'Strict',        // Prevent cross-site requests
+    ];
+
+    // Set the cookie
+    setcookie($key, $value, $cookieOptions);
+}
+
+function getRememberKeyCookie($key) {
+    if (isset($_COOKIE[$key])) {
+        // Return the sanitized cookie value
+        return htmlspecialchars($_COOKIE[$key]);
+    }
+    return null;
 }

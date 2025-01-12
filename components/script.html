@@ -4,3 +4,83 @@
 <script src="./assets/plugins/global/plugins.bundle.js"></script>
 <script src="./assets/js/scripts.bundle.js"></script>
 <script src="./assets/js/fa_pro_67.js" data-auto-replace-svg="false"></script>
+<script src="./assets/js/jquery-ui.min.js"></script>
+
+<script>
+    function logout() {
+        Swal.fire({
+            text: `ต้องการออกจากระบบหรือไม่`,
+            icon: "warning",
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: "ตกลง",
+            cancelButtonText: "ยกเลิก",
+            customClass: {
+                confirmButton: "btn fw-bold btn-danger",
+                cancelButton: "btn fw-bold btn-active-light-primary"
+            }
+        }).then(function (result) {
+            $.ajax({
+                type: "POST",
+                url: "./actions/logout.php",
+                dataType: 'JSON',
+                success: function (result) {
+                    if (result.status === 'success') {
+                        window.location = './login.php';
+                    } else if (result.status === 'error' || result.status === 'warning') {
+                        Swal.fire({
+                            text: result.message,
+                            icon: result.status,
+                            buttonsStyling: false,
+                            confirmButtonText: "ตกลง",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            text: "Error Response!",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "ตกลง",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
+                    }
+                },
+                error: function (jqXHR, exception) {
+                    Swal.fire({
+                        text: getErrorMessage(jqXHR, exception),
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "ตกลง",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                },
+            });
+        });
+    }
+
+    function getErrorMessage(jqXHR, exception) {
+        var msg = '';
+        if (jqXHR.status === 0) {
+            msg = 'Not connect.\n Verify Network.';
+        } else if (jqXHR.status == 404) {
+            msg = 'Requested page not found. [404]';
+        } else if (jqXHR.status == 500) {
+            msg = 'Internal Server Error [500].';
+        } else if (exception === 'parsererror') {
+            msg = 'Requested JSON parse failed.';
+        } else if (exception === 'timeout') {
+            msg = 'Time out error.';
+        } else if (exception === 'abort') {
+            msg = 'Ajax request aborted.';
+        } else {
+            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+        }
+        return msg;
+    }
+</script>

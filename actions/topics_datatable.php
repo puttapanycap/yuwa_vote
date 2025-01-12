@@ -14,9 +14,7 @@ $vote_conn = $connections['vote'];
 // Parameters Setup :: START
 $requestData = $_REQUEST;
 $draw = isset($requestData['draw']) ? intval($requestData['draw']) : 0;
-// $searchValue = isset($requestData['input_search_employee']) ? $requestData['input_search_employee'] : "";
-// $searchID = isset($requestData['select_account_id']) ? $requestData['select_account_id'] : "";
-// $searchDate = isset($requestData['input_search_date']) ? $requestData['input_search_date'] : "";
+$searchValue = isset($requestData['input_search']) ? $requestData['input_search'] : "";
 $orderableDir = isset($requestData['order'][0]['dir']) ? $requestData['order'][0]['dir'] : "asc";
 $orderableIndexes = 0;
 foreach ($requestData['columns'] as $index => $column) {
@@ -26,29 +24,29 @@ foreach ($requestData['columns'] as $index => $column) {
 }
 $hip_columns = ['expire_datetime', 'topic_title', null];
 $hip_order_by = $hip_columns[$orderableIndexes];
-$topic_data = [];
 // Parameters Setup :: END
 
-$topic_sql = "SELECT
-                id,
-                topic_title,
-                expire_datetime,
-                member_id
-            FROM
-                vote_topics";
+$topic_sql = "  SELECT
+                    id,
+                    topic_title,
+                    expire_datetime,
+                    member_id,
+                    share_key
+                FROM
+                    vote_topics ";
 $topic_query = $vote_conn->query($topic_sql);
 $total_all = $topic_query->num_rows;
 
-if ( isset($requestData['input_search']) ) {
-    $searchValue = $requestData['input_search'];
+if ( strlen($searchValue) > 0 ) {
     $topic_sql .= " WHERE topic_title LIKE '%$searchValue%'";
 }
 $topic_query = $vote_conn->query($topic_sql);
 $total_filtered = $topic_query->num_rows;
 
 $topic_sql .= " ORDER BY $hip_order_by $orderableDir ";
-$topic_sql .= " LIMIT " . intval($requestData['start'] . ", " . intval($requestData['length']))." ";
+$topic_sql .= " LIMIT " . intval($requestData['start']) . ", " . intval($requestData['length'])." ";
 $topic_query = $vote_conn->query($topic_sql);
+$topic_data = [];
 while ($topic_row = $topic_query->fetch_assoc()) {
     $topic_data[] = $topic_row;
 }
