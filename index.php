@@ -7,7 +7,7 @@ if (!isset($_SESSION['session_key'])) {
 	header('location: ' . _WEBROOT_PATH_ . 'login.php');
 	exit(0);
 }
-if ($_SESSION['session_key'] != 'ycapHA0012251') {
+if ($_SESSION['session_key'] != 'Vote12345') {
 	header('location: ' . _WEBROOT_PATH_ . 'login.php');
 	exit(0);
 }

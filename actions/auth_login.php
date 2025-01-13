@@ -2,9 +2,9 @@
 
 $result = [];
 
-if ($_POST['input_password'] == 'ycapHA0012251') {
+if ($_POST['input_password'] == 'Vote12345') {
     session_start();
-    $_SESSION['session_key'] = 'ycapHA0012251';
+    $_SESSION['session_key'] = 'Vote12345';
     $result['status'] = 'success';
 }
 else {

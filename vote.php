@@ -39,8 +39,8 @@ $isExpire = $today > $topic_expire ? true : false;
 $cookieName = 'remember_key';
 $rememberKey = getRememberKeyCookie($cookieName);
 $client_info = getClientInfo();
-$IPAddress = $client_info['ip_address'];
-
+$IPAddress = explode(', ', $client_info['ip_address']);
+$IPAddress = $IPAddress[0];
 if (!$rememberKey) {
     $newRememberKey = hash('sha256', uniqid('user_', true));
     setRememberKeyCookie($cookieName, $newRememberKey);
@@ -167,7 +167,7 @@ while ($choice_row = $choices_query->fetch_assoc()) {
 
         function sendVote() {
             Swal.fire({
-                text: `ต้องการลบ Topic นี้หรือไม่`,
+                text: `ยืนยันการโหวต`,
                 icon: "warning",
                 showCancelButton: true,
                 buttonsStyling: false,

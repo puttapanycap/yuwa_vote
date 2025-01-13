@@ -14,7 +14,8 @@ $vote_conn = $connections['vote'];
 $cookieName = 'remember_key';
 $rememberKey = getRememberKeyCookie($cookieName);
 $client_info = getClientInfo();
-$IPAddress = $client_info['ip_address'];
+$IPAddress = explode(', ', $client_info['ip_address']);
+$IPAddress = $IPAddress[0];
 
 $response = [];
 $vote_datas = [
