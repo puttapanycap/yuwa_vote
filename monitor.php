@@ -3,11 +3,19 @@
 session_start();
 define('_WEBROOT_PATH_', './');
 
-if (!isset($_SESSION['session_key'])) {
+// Connection Setup :: START
+require _WEBROOT_PATH_ . '/helpers/load_env.php';
+require _WEBROOT_PATH_ . '/helpers/functions.php';
+$connections = getDatabaseConnections();
+$vote_conn = $connections['vote'];
+// Connection Setup :: END
+
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_name'])) {
 	header('location: ' . _WEBROOT_PATH_ . 'login.php');
 	exit(0);
 }
-if ($_SESSION['session_key'] != 'Vote12345') {
+
+if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 	header('location: ' . _WEBROOT_PATH_ . 'login.php');
 	exit(0);
 }
@@ -17,12 +25,6 @@ if (!isset($_GET['key'])) {
 	exit(0);
 }
 
-// Connection Setup :: START
-require _WEBROOT_PATH_ . 'helpers/load_env.php';
-require _WEBROOT_PATH_ . 'helpers/functions.php';
-$connections = getDatabaseConnections();
-$vote_conn = $connections['vote'];
-// Connection Setup :: END
 $topic_key = $_GET['key'];
 $topic_sql = "  SELECT
                     id,

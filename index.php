@@ -3,11 +3,19 @@
 session_start();
 define('_WEBROOT_PATH_', './');
 
-if (!isset($_SESSION['session_key'])) {
+// Connection Setup :: START
+require _WEBROOT_PATH_ . '/helpers/load_env.php';
+require _WEBROOT_PATH_ . '/helpers/functions.php';
+$connections = getDatabaseConnections();
+$vote_conn = $connections['vote'];
+// Connection Setup :: END
+
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_name'])) {
 	header('location: ' . _WEBROOT_PATH_ . 'login.php');
 	exit(0);
 }
-if ($_SESSION['session_key'] != 'Vote12345') {
+
+if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 	header('location: ' . _WEBROOT_PATH_ . 'login.php');
 	exit(0);
 }
@@ -171,7 +179,7 @@ if ($_SESSION['session_key'] != 'Vote12345') {
 										<button class="btn btn-icon btn-sm btn-success" onclick="topicQRCode('${row.id}')">
 											<i class="fa-solid fa-qrcode fs-3"></i>
 										</button>
-										<a target="_blank" href="./monitor.php?key=${row.share_key}" class="btn btn-icon btn-sm btn-info">
+										<a href="./monitor.php?key=${row.share_key}" class="btn btn-icon btn-sm btn-info">
 											<i class="fa-solid fa-chart-pie fs-3"></i>
 										</a>
 										<button class="btn btn-icon btn-sm btn-danger" onclick="topicDelete('${row.id}')">

@@ -5,10 +5,11 @@ define('_WEBROOT_PATH_', './');
 
 require _WEBROOT_PATH_ . 'helpers/load_env.php';
 
-if (isset($_SESSION['session_key'])) {
-    header('location: ' . _WEBROOT_PATH_);
-    exit(0);
+if (isset($_SESSION['user_id']) || isset($_SESSION['user_name'])) {
+	header('location: ' . _WEBROOT_PATH_);
+	exit(0);
 }
+
 
 ?>
 
@@ -77,20 +78,18 @@ if (isset($_SESSION['session_key'])) {
             <img class="logo" src="assets/medias/logos/android-chrome-192x192.png" alt="">
 
             <span class="fs-3 fw-bold">เข้าสู่ระบบ</span>
+
+            <span>ขอ Username/Password จาก IT</span>
             <form id="login-form" class="d-flex w-250px flex-column gap-2">
 
                 <div class="form-floating">
-                    <input type="password" class="form-control form-control-solid border" id="input_password" name="input_password" placeholder="รหัสผ่าน" />
-                    <label for="input_password">รหัสผ่าน</label>
+                    <input type="text" class="form-control form-control-solid border" id="input_username" name="input_username" placeholder="Username" />
+                    <label for="input_username">Username</label>
                 </div>
-
-                <div class="d-flex justify-content-between">
-                    <div class="form-check form-check-custom form-check-solid form-check-lg">
-                        <input class="form-check-input" type="checkbox" value="true" id="cb_remember" />
-                        <label class="form-check-label" for="cb_remember">
-                            จดจำการเข้าสู่ระบบ
-                        </label>
-                    </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control form-control-solid border" id="input_password" name="input_password" placeholder="Password" />
+                    <label for="input_password">Password</label>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">Login</button>
@@ -103,35 +102,6 @@ if (isset($_SESSION['session_key'])) {
         </span>
 
     </main>
-
-    <div class="modal modal-stacked fade" tabindex="-1" id="modal_reset_password">
-        <div class="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header px-4 py-3">
-                    <h5 class="modal-title" id="modal_reset_password_title">รีเซ็ตรหัสผ่าน</h5>
-                    <div class="btn btn-icon btn-sm btn-color-gray-600 btn-active-light-danger ms-2" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="fa-solid fa-xmark fs-2"></i>
-                    </div>
-                </div>
-                <div class="modal-body bg-light p-3" id="modal_view_visa_request_body">
-                    <div class="container">
-                        <div class="d-flex flex-column gap-4">
-
-                            <div class="card">
-                                <div class="card-body">
-                                    <label for="input_reset_pass_email" class="required form-label">Email (เข้าสู่ระบบ)</label>
-                                    <input type="email" id="input_reset_pass_email" name="input_reset_pass_email" class="form-control form-control-solid" placeholder="example@gmail.com" />
-                                </div>
-                            </div>
-
-                            <button class="btn btn-primary" onclick="sendResetPassword()">ส่ง</button>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!--begin::Javascript-->
     <script>
@@ -174,7 +144,8 @@ if (isset($_SESSION['session_key'])) {
                     url: './actions/auth_login.php',
                     type: 'POST',
                     data: {
-                        input_password: $('#input_password').val(),
+                        username: $('#input_username').val(),
+                        password: $('#input_password').val(),
                     },
                     dataType: 'JSON',
                     beforeSend: function() {

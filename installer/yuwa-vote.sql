@@ -1,7 +1,7 @@
 /*
- Navicat Premium Data Transfer
+ Navicat Premium Dump SQL
 
- Source Server         : [MariaDB] localhost
+ Source Server         : MariaDB_localhost
  Source Server Type    : MariaDB
  Source Server Version : 110502 (11.5.2-MariaDB-log)
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 110502 (11.5.2-MariaDB-log)
  File Encoding         : 65001
 
- Date: 13/01/2025 00:15:17
+ Date: 14/01/2025 16:47:20
 */
 
 SET NAMES utf8mb4;
@@ -29,17 +29,11 @@ CREATE TABLE `vote_choices`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `topic_id`(`topic_id` ASC) USING BTREE,
   CONSTRAINT `vote_choices_ibfk_1` FOREIGN KEY (`topic_id`) REFERENCES `vote_topics` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of vote_choices
 -- ----------------------------
-INSERT INTO `vote_choices` VALUES (5, 3, 'การแสดงที่ 1', 1);
-INSERT INTO `vote_choices` VALUES (6, 3, 'การแสดงที่ 2', 2);
-INSERT INTO `vote_choices` VALUES (7, 3, 'การแสดงที่ 4', 3);
-INSERT INTO `vote_choices` VALUES (8, 3, 'การแสดงที่ 3', 4);
-INSERT INTO `vote_choices` VALUES (9, 4, 'ตัวเลือกที่ 1', 1);
-INSERT INTO `vote_choices` VALUES (10, 4, 'ตัวเลือกที่ 2', 2);
 
 -- ----------------------------
 -- Table structure for vote_members
@@ -50,13 +44,14 @@ CREATE TABLE `vote_members`  (
   `member_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `member_username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `member_password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `create_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of vote_members
 -- ----------------------------
-INSERT INTO `vote_members` VALUES (1, NULL, 'admin', NULL);
+INSERT INTO `vote_members` VALUES (1, 'YUWA IT', 'admin', '$2y$10$oaoOGbk90tOdon59Nmirku4xjqz/oqNQFZRc4NMkXWcSsIL5VovC2', '2025-01-14 16:00:00');
 
 -- ----------------------------
 -- Table structure for vote_results
@@ -91,12 +86,10 @@ CREATE TABLE `vote_topics`  (
   `member_id` int(11) NULL DEFAULT 1,
   `share_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of vote_topics
 -- ----------------------------
-INSERT INTO `vote_topics` VALUES (3, 'ทดสอบเปิด Vote', '2025-01-13 00:15:00', 1, '9f8b7c4d3a2e1f5601d0c9ab3e4856');
-INSERT INTO `vote_topics` VALUES (4, 'ทดสอบเปิด Vote 2', '2025-01-13 16:00:00', 1, '7d7f128df78b991f');
 
 SET FOREIGN_KEY_CHECKS = 1;

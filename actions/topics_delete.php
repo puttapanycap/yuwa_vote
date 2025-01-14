@@ -31,8 +31,5 @@ if ($vote_conn->query($choice_sql) === TRUE) {
     $response['message'] = 'Error delete choice';
 }
 
-
-
-
 echo json_encode($response);
 $vote_conn->close();

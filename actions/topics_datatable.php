@@ -26,6 +26,8 @@ $hip_columns = ['expire_datetime', 'topic_title', null];
 $hip_order_by = $hip_columns[$orderableIndexes];
 // Parameters Setup :: END
 
+$member_id = $_SESSION['user_id'];
+
 $topic_sql = "  SELECT
                     id,
                     topic_title,
@@ -33,12 +35,14 @@ $topic_sql = "  SELECT
                     member_id,
                     share_key
                 FROM
-                    vote_topics ";
+                    vote_topics 
+                WHERE
+                    member_id = '$member_id' ";
 $topic_query = $vote_conn->query($topic_sql);
 $total_all = $topic_query->num_rows;
 
 if ( strlen($searchValue) > 0 ) {
-    $topic_sql .= " WHERE topic_title LIKE '%$searchValue%'";
+    $topic_sql .= " AND topic_title LIKE '%$searchValue%'";
 }
 $topic_query = $vote_conn->query($topic_sql);
 $total_filtered = $topic_query->num_rows;

@@ -26,7 +26,7 @@
                 dataType: 'JSON',
                 success: function (result) {
                     if (result.status === 'success') {
-                        window.location = './login.php';
+                        window.location.href = './login.php';
                     } else if (result.status === 'error' || result.status === 'warning') {
                         Swal.fire({
                             text: result.message,

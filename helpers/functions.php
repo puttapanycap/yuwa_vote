@@ -300,3 +300,10 @@ function getRememberKeyCookie($key) {
     }
     return null;
 }
+
+function isHasMember($sess_id, $sess_username) {
+    global $vote_conn;
+    $sql = "SELECT * FROM vote_members WHERE `id`='$sess_id' AND member_username='$sess_username' ";
+    $query = $vote_conn->query($sql);
+    return $query->num_rows > 0 ? true : false ;
+}

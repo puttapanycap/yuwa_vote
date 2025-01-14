@@ -6,12 +6,11 @@ define('_WEBROOT_PATH_', '../');
 
 // Connection Setup :: START
 require _WEBROOT_PATH_ . '/helpers/load_env.php';
+
 require _WEBROOT_PATH_ . '/helpers/functions.php';
 $connections = getDatabaseConnections();
 $vote_conn = $connections['vote'];
 // Connection Setup :: END
-
-use chillerlan\QRCode\QRCode;
 
 $topic_id = $_POST['topic_id'];
 $response = [];
@@ -30,6 +29,8 @@ $expire_datetime = $topic_row['expire_datetime'];
 $topic_title = $topic_row['topic_title'];
 
 $url = $_ENV['VOTE_WEB_URL'] . 'vote.php?key=' . $topic_row['share_key'];
+
+use chillerlan\QRCode\QRCode;
 $qrCodeSrc = (new QRCode)->render($url);
 
 ?>

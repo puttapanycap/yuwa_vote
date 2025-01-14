@@ -19,7 +19,7 @@ $response = [];
 $topic_datas = [
     'topic_title' => $topic_title,
     'expire_datetime' => $expire_datetime,
-    'member_id' => 1,
+    'member_id' => $_SESSION['user_id'],
     'share_key' => generateTopicKey(16)
 ];
 $topic_sql = arrayToInsertSQL('vote_topics', $topic_datas);
