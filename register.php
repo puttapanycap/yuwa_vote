@@ -6,8 +6,8 @@ define('_WEBROOT_PATH_', './');
 require _WEBROOT_PATH_ . 'helpers/load_env.php';
 
 if (isset($_SESSION['user_id']) || isset($_SESSION['user_name'])) {
-	header('location: ' . _WEBROOT_PATH_);
-	exit(0);
+    header('location: ' . _WEBROOT_PATH_);
+    exit(0);
 }
 
 
@@ -61,27 +61,55 @@ if (isset($_SESSION['user_id']) || isset($_SESSION['user_name'])) {
         <div class="login">
             <img class="logo" src="assets/medias/logos/android-chrome-192x192.png" alt="">
 
-            <span class="fs-3 fw-bold">เข้าสู่ระบบ</span>
-
+            <span class="fs-3 fw-bold">ลงทะเบียน</span>
             <form id="login-form" class="d-flex w-250px flex-column gap-2">
-
-                <div class="form-floating">
-                    <input type="text" class="form-control form-control-solid border" id="input_username" name="input_username" placeholder="Username" />
-                    <label for="input_username">Username</label>
+                <div class="mt-2 d-flex flex-row align-items-center">
+                    <i class="ki-solid ki-badge fs-2 me-2"></i> ชื่อผู้ใช้
                 </div>
-                
                 <div class="form-floating">
-                    <input type="password" class="form-control form-control-solid border" id="input_password" name="input_password" placeholder="Password" />
-                    <label for="input_password">Password</label>
+                    <input type="text" class="form-control form-control-solid border"
+                        id="input_username"
+                        name="input_username"
+                        placeholder="Username"
+                        required />
+                    <label for="input_username" class="required">Username</label>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <div class="mt-2 d-flex flex-row align-items-center">
+                    <i class="ki-solid ki-key-square fs-2 me-2"></i> รหัสผ่าน
+                </div>
+                <div class="form-floating">
+                    <input type="password" class="form-control form-control-solid border"
+                        id="input_password"
+                        name="input_password"
+                        placeholder="Password"
+                        required />
+                    <label for="input_password" class="required">Password</label>
+                </div>
+                <div class="form-floating">
+                    <input type="password" class="form-control form-control-solid border"
+                        id="input_password_confirm"
+                        name="input_password_confirm"
+                        placeholder="ยืนยัน Password"
+                        required />
+                    <label for="input_password_confirm" class="required">ยืนยัน Password</label>
+                </div>
+
+                <div class="mt-2 d-flex flex-row align-items-center">
+                    <i class="ki-solid ki-sms fs-2 me-2"></i> อีเมลล์
+                </div>
+                <div class="form-floating">
+                    <input type="email" class="form-control form-control-solid border"
+                        id="input_email"
+                        name="input_email"
+                        placeholder="user@example.com"
+                        required />
+                    <label for="input_email" class="required">Email</label>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">ลงทะเบียน</button>
             </form>
-            <div class="w-100 separator border-2 border-secondary my-3"></div>
 
-            <div class="w-100 d-flex flex-column gap-2">
-                <a href="./register.php" class="w-100 btn btn-light-danger">ลงทะเบียน</a>
-            </div>
         </div>
 
         <span class="d-flex flex-row justify-content-start align-items-center gap-2">
@@ -103,16 +131,47 @@ if (isset($_SESSION['user_id']) || isset($_SESSION['user_name'])) {
         $("form").submit(function(event) {
             event.preventDefault();
 
-            let input_password = $('#input_password').val();
+            let input_username = $('#input_username');
+            let input_password = $('#input_password');
+            let input_password_confirm = $('#input_password_confirm');
+            let input_email = $('#input_email');
+
+            input_username.removeClass('is-invalid');
+            input_password.removeClass('is-invalid');
+            input_password_confirm.removeClass('is-invalid');
+            input_email.removeClass('is-invalid');
 
             let pass_arr_status = [];
             let pass_arr_message = [];
 
-            if (input_password == '') {
+            if (input_username.val() == '') {
+                $('#input_username').addClass('is-invalid');
+                pass_arr_status.push(0);
+                pass_arr_message.push('Username');
+            }
+            
+            if (input_password.val() == '') {
                 $('#input_password').addClass('is-invalid');
-                initCheckInvalid('input_password');
                 pass_arr_status.push(0);
                 pass_arr_message.push('Password');
+            }
+
+            if (input_password_confirm.val() == '') {
+                $('#input_password_confirm').addClass('is-invalid');
+                pass_arr_status.push(0);
+                pass_arr_message.push('ยืนยัน Password');
+            }
+            
+            if (input_email.val() == '') {
+                $('#input_email').addClass('is-invalid');
+                pass_arr_status.push(0);
+                pass_arr_message.push('Email');
+            }
+
+            if (input_password.val() != input_password_confirm.val()) {
+                $('#input_password').addClass('is-invalid');
+                pass_arr_status.push(0);
+                pass_arr_message.push('Password ไม่ตรงกัน');
             }
 
             if (pass_arr_status.includes(0)) {
@@ -128,17 +187,18 @@ if (isset($_SESSION['user_id']) || isset($_SESSION['user_name'])) {
             } else {
 
                 $.ajax({
-                    url: './actions/auth_login.php',
+                    url: './actions/register.php',
                     type: 'POST',
                     data: {
                         username: $('#input_username').val(),
                         password: $('#input_password').val(),
+                        email: $('#input_email').val(),
                     },
                     dataType: 'JSON',
                     beforeSend: function() {
                         Swal.fire({
                             html: `<div class="d-flex flex-column flex-center gap-3">
-                                    <span class="fs-5 fw-bold">กำลังตรวจสอบข้อมูล</span>
+                                    <span class="fs-5 fw-bold">กำลังส่งข้อมูล</span>
                                     <img class="h-100px" src="./assets/medias/svg/loading-dots-transparent.svg">
                                 </div>`,
                             buttonsStyling: false,
@@ -149,13 +209,13 @@ if (isset($_SESSION['user_id']) || isset($_SESSION['user_name'])) {
                     success: function(result) {
                         if (result.status === 'success') {
                             Swal.fire({
-                                text: `เข้าสู่ระบบสำเร็จ`,
+                                text: result.message,
                                 icon: "success",
                                 buttonsStyling: false,
                                 showConfirmButton: false,
                                 timer: 1000
                             }).then(function() {
-                                window.location = './';
+                                window.location.href = './login.php';
                             });
                         } else if (result.status === 'error' || result.status === 'warning') {
                             Swal.fire({

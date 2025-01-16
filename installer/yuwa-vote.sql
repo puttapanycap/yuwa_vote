@@ -44,6 +44,7 @@ CREATE TABLE `vote_members`  (
   `member_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `member_username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `member_password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `member_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `create_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
@@ -51,7 +52,7 @@ CREATE TABLE `vote_members`  (
 -- ----------------------------
 -- Records of vote_members
 -- ----------------------------
-INSERT INTO `vote_members` VALUES (1, 'YUWA IT', 'admin', '$2y$10$oaoOGbk90tOdon59Nmirku4xjqz/oqNQFZRc4NMkXWcSsIL5VovC2', '2025-01-14 16:00:00');
+INSERT INTO `vote_members` VALUES (1, 'YUWA IT', 'admin', '$2y$10$oaoOGbk90tOdon59Nmirku4xjqz/oqNQFZRc4NMkXWcSsIL5VovC2', 'admin@example.com', '2025-01-14 16:00:00');
 
 -- ----------------------------
 -- Table structure for vote_results
