@@ -58,6 +58,7 @@ if (isset($_SESSION['user_id']) || isset($_SESSION['user_name'])) {
         document.documentElement.setAttribute("data-bs-theme", "light");
     </script>
     <main class="d-flex flex-column justify-content-center align-items-center gap-6 h-100">
+        <a href="./login.php" class="btn bg-body btn-color-primary shadow-sm">Login</a>
         <div class="login">
             <img class="logo" src="assets/medias/logos/android-chrome-192x192.png" alt="">
 
