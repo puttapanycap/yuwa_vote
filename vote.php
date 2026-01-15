@@ -78,6 +78,171 @@ while ($choice_row = $choices_query->fetch_assoc()) {
 <head>
     <?php require _WEBROOT_PATH_ . 'components/head.html'; ?>
     <?php require _WEBROOT_PATH_ . 'components/script.html'; ?>
+    <style>
+        /* Modern Vote Page Styles */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .vote-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.25);
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .vote-header .subtitle {
+            opacity: 0.9;
+            font-size: 1.2rem;
+        }
+
+        .vote-header .title {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .vote-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Status Icons */
+        .status-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .status-icon.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
+        }
+
+        .status-icon.error {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            box-shadow: 0 10px 30px rgba(235, 51, 73, 0.3);
+        }
+
+        /* Countdown Timer */
+        .countdown-container {
+            margin: 1.5rem 0;
+        }
+
+        .countdown-item {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+            box-shadow: 0 8px 25px rgba(26, 26, 46, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .countdown-item:hover {
+            transform: scale(1.1);
+        }
+
+        .countdown-item .number {
+            font-size: 2rem;
+            font-weight: bold;
+            line-height: 1;
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .countdown-item .label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Choice Cards */
+        .choice-label {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .choice-label:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .choice-label .choice-inner {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-check:checked+.choice-label .choice-inner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-check:checked+.choice-label .choice-inner .star-icon {
+            color: #ffd700;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+        }
+
+        .star-icon {
+            color: #ffc107;
+            transition: all 0.3s ease;
+        }
+
+        .choice-label:hover .star-icon {
+            transform: scale(1.2) rotate(20deg);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(17, 153, 142, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .countdown-item {
+                width: 70px;
+                height: 70px;
+            }
+
+            .countdown-item .number {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -88,54 +253,65 @@ while ($choice_row = $choices_query->fetch_assoc()) {
 
     <div class="container flex-column-fluid my-4">
 
-        <div class="w-100 card p-4 d-flex flex-column flex-center mb-4">
-            <span class="fs-3 fw-bold text-center me-4">ลงคะแนน</span>
-            <span class="fs-1 fw-bold text-center me-4"><?php echo $topic_title ?></span>
+        <!-- Enhanced Header -->
+        <div class="w-100 vote-header mb-4">
+            <span class="subtitle d-block mb-2">ลงคะแนน</span>
+            <span class="fs-1 fw-bold title d-block"><?php echo htmlspecialchars($topic_title) ?></span>
         </div>
 
-        <div class="card d-flex flex-column flex-wrap flex-center gap-4 shadow-sm p-4" id="topic_votes">
+        <!-- Vote Card -->
+        <div class="vote-card" id="topic_votes">
 
-
-            <?php if ($isExpire) : ?>
-                <div class="d-flex flex-column flex-wrap flex-center">
-                    <span class="h-60px w-60px rounded-circle d-flex flex-center bg-secondary text-danger">
-                        <i class="fa-solid fa-xmark-large fs-2hx"></i>
-                    </span>
-                    <span class="fs-3 text-gray-700">หมดเวลาลงคะแนนแล้ว</span>
+            <?php if ($isExpire): ?>
+                <!-- Expired State -->
+                <div class="d-flex flex-column align-items-center py-4">
+                    <div class="status-icon error">
+                        <i class="fa-solid fa-xmark fs-2hx text-white"></i>
+                    </div>
+                    <span class="fs-2 fw-bold text-gray-800 mb-2">หมดเวลาลงคะแนนแล้ว</span>
+                    <span class="text-gray-500">ขอบคุณสำหรับความสนใจ</span>
                 </div>
             <?php else: ?>
-                <?php if ($vote_count > 0) : ?>
-                    <div class="d-flex flex-column flex-wrap flex-center">
-                        <span class="h-60px w-60px rounded-circle d-flex flex-center bg-secondary text-success">
-                            <i class="fa-solid fa-check fs-2hx"></i>
-                        </span>
-                        <span class="fs-3 text-gray-700">ท่านลงคะแนนแล้ว</span>
+                <?php if ($vote_count > 0): ?>
+                    <!-- Already Voted State -->
+                    <div class="d-flex flex-column align-items-center py-4">
+                        <div class="status-icon success">
+                            <i class="fa-solid fa-check fs-2hx text-white"></i>
+                        </div>
+                        <span class="fs-2 fw-bold text-gray-800 mb-2">ท่านลงคะแนนแล้ว</span>
+                        <span class="text-gray-500">ขอบคุณสำหรับการมีส่วนร่วม</span>
                     </div>
                 <?php else: ?>
-                    <div class="fs-2x fw-bold">เลือกลงคะแนน</div>
-                    <div id="countdown"></div>
-                    <div class="d-flex flex-row flex-wrap flex-center gap-4">
+                    <!-- Voting Interface -->
+                    <div class="text-center mb-4">
+                        <div class="fs-2x fw-bold text-gray-800 mb-2">เลือกลงคะแนน</div>
+                        <div class="countdown-container" id="countdown"></div>
+                    </div>
 
+                    <div class="d-flex flex-row flex-wrap justify-content-center gap-3 mb-4">
                         <?php
                         $i = 0;
-                        foreach ($choices as $cc) :
-                        ?>
+                        foreach ($choices as $cc):
+                            ?>
                             <input type="radio" class="btn-check" name="choice_for_vote" value="<?php echo $cc['id'] ?>" <?php echo $i == 0 ? 'checked' : ''; ?> id="choice_<?php echo $cc['id'] ?>" />
-                            <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-4 d-flex align-items-center shadow-sm" for="choice_<?php echo $cc['id'] ?>">
-                                <div class="d-flex flex-column flex-center gap-2 p-4">
-                                    <i class="ki-solid ki-star text-warning fs-4x"></i>
-                                    <span class="d-block fw-semibold text-start">
-                                        <span class="text-gray-900 fw-bold d-block fs-3"><?php echo $cc['choice_title'] ?></span>
-                                    </span>
+                            <label class="choice-label" for="choice_<?php echo $cc['id'] ?>">
+                                <div class="choice-inner d-flex flex-column align-items-center gap-2">
+                                    <i class="ki-solid ki-star fs-3x star-icon"></i>
+                                    <span class="fw-bold fs-4"><?php echo htmlspecialchars($cc['choice_title']) ?></span>
                                 </div>
                             </label>
-                        <?php
+                            <?php
                             $i++;
                         endforeach;
                         ?>
-
                     </div>
-                    <button class="btn btn-success" onclick="sendVote()">ส่งผลโหวต</button>
+
+                    <div class="text-center">
+                        <button class="submit-btn" onclick="sendVote()">
+                            <i class="fa-solid fa-paper-plane me-2"></i>
+                            ส่งผลโหวต
+                        </button>
+                    </div>
                 <?php endif; ?>
             <?php endif; ?>
 
@@ -151,17 +327,18 @@ while ($choice_row = $choices_query->fetch_assoc()) {
 
         function sendVote() {
             Swal.fire({
-                text: `ยืนยันการโหวต`,
-                icon: "warning",
+                title: 'ยืนยันการโหวต',
+                text: "คุณต้องการส่งผลโหวตใช่หรือไม่",
+                icon: "question",
                 showCancelButton: true,
                 buttonsStyling: false,
-                confirmButtonText: "ตกลง",
+                confirmButtonText: '<i class="fa-solid fa-check me-2"></i>ยืนยัน',
                 cancelButtonText: "ยกเลิก",
                 customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                    cancelButton: "btn fw-bold btn-active-light-primary"
+                    confirmButton: "btn fw-bold btn-success mx-2",
+                    cancelButton: "btn fw-bold btn-secondary mx-2"
                 }
-            }).then(function(result) {
+            }).then(function (result) {
                 if (result.value) {
                     $.ajax({
                         url: './actions/vote.php',
@@ -171,15 +348,16 @@ while ($choice_row = $choices_query->fetch_assoc()) {
                             choice_id: $('input[name="choice_for_vote"]:checked').val(),
                         },
                         dataType: 'JSON',
-                        success: function(result) {
+                        success: function (result) {
                             if (result.status === 'success') {
                                 Swal.fire({
-                                    text: `ส่งผล Vote สำเร็จ`,
+                                    title: 'สำเร็จ!',
+                                    text: 'ส่งผล Vote สำเร็จ',
                                     icon: "success",
                                     buttonsStyling: false,
                                     showConfirmButton: false,
-                                    timer: 1000
-                                }).then(function() {
+                                    timer: 1500
+                                }).then(function () {
                                     location.reload();
                                 });
                             } else if (result.status === 0) {
@@ -220,41 +398,33 @@ while ($choice_row = $choices_query->fetch_assoc()) {
                 const timeRemaining = targetDate - now;
 
                 if (timeRemaining <= 0) {
-                    // หากถึงเวลาที่กำหนดให้รีเฟรชหน้า
                     clearInterval(intervalId);
                     intervalId = null;
-                    // $('#topic_votes').html(`<div class="d-flex flex-column flex-wrap flex-center">
-                    //                 <span class="h-60px w-60px rounded-circle d-flex flex-center bg-secondary text-danger">
-                    //                     <i class="fa-solid fa-xmark-large fs-2hx"></i>
-                    //                 </span>
-                    //                 <span class="fs-3 text-gray-700">หมดเวลาลงคะแนนแล้ว</span>
-                    //             </div>`);
+                    document.getElementById("countdown").innerHTML = `
+                        <div class="text-danger fw-bold fs-3">หมดเวลา</div>
+                    `;
                 } else {
-                    // คำนวณเวลา
-                    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-                    // แสดงผลเวลา (อัพเดตใน HTML ถ้ามี)
                     document.getElementById("countdown").innerHTML = `
-                        <div class="d-flex flex-row flex-wrap gap-2 align-items-center">
-                            <div class="d-flex flex-column flex-center bg-dark h-80px w-80px rounded-circle text-inverse-dark">
-                                <span class="lh-1 fs-2hx">${hours}</span>
-                                <span class="lh-1">ชม.</span>
+                        <div class="d-flex flex-row flex-wrap gap-3 justify-content-center align-items-center">
+                            <div class="countdown-item">
+                                <span class="number">${hours.toString().padStart(2, '0')}</span>
+                                <span class="label">ชม.</span>
                             </div>
-                            <div class="d-flex flex-column flex-center bg-dark h-80px w-80px rounded-circle text-inverse-dark">
-                                <span class="lh-1 fs-2hx">${minutes}</span>
-                                <span class="lh-1">นาที</span>
+                            <div class="countdown-item">
+                                <span class="number">${minutes.toString().padStart(2, '0')}</span>
+                                <span class="label">นาที</span>
                             </div>
-                            <div class="d-flex flex-column flex-center bg-dark h-80px w-80px rounded-circle text-inverse-dark">
-                                <span class="lh-1 fs-2hx">${seconds}</span>
-                                <span class="lh-1">วินาที</span>
+                            <div class="countdown-item">
+                                <span class="number">${seconds.toString().padStart(2, '0')}</span>
+                                <span class="label">วินาที</span>
                             </div>
                         </div>
                     `;
 
-                    // เรียกฟังก์ชันนี้ซ้ำทุก 1 วินาที
                     intervalId = setTimeout(updateCountdown, 1000);
                 }
             }

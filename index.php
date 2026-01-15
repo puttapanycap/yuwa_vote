@@ -85,7 +85,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 	</div>
 
 	<div class="modal fade" id="topicManageModal" tabindex="-1">
-		<div class="modal-dialog">
+		<div class="modal-dialog modal-xl">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="topicManageTitle">Topic Manager</h5>
@@ -107,11 +107,11 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 	<script src="./assets/plugins/custom/formrepeater/formrepeater.bundle.js"></script>
 
 	<script>
-		var tableTopics = function() {
+		var tableTopics = function () {
 			var table;
 			var dt;
 
-			var initDatatable = function() {
+			var initDatatable = function () {
 				dt = $('#topicsTable').DataTable({
 					searchDelay: 500,
 					processing: true,
@@ -138,24 +138,24 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 						type: 'POST',
 						dataType: 'JSON',
 						cache: false,
-						data: function(data) {
+						data: function (data) {
 							// data.input_search = $('#input_search').val();
 						}
 					},
 					columns: [{
-							data: 'expire_datetime'
-						},
-						{
-							data: 'topic_title'
-						},
-						{
-							data: null
-						},
+						data: 'expire_datetime'
+					},
+					{
+						data: 'topic_title'
+					},
+					{
+						data: null
+					},
 					],
 					columnDefs: [{
 						targets: -1,
 						orderable: false,
-						render: function(data, type, row) {
+						render: function (data, type, row) {
 							return `<div class="d-flex flex-row align-items-end justify-content-end gap-2">
 										<button class="btn btn-icon btn-sm btn-warning" onclick="topicEdit('${row.id}')">
 											<i class="fa-solid fa-pen fs-3"></i>
@@ -172,14 +172,14 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 									</div>`;
 
 						}
-					}, ]
+					},]
 				});
 
 			}
 
 			// Public methods
 			return {
-				init: function() {
+				init: function () {
 					initDatatable();
 				}
 			}
@@ -187,7 +187,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 		}();
 
 		// On document ready
-		KTUtil.onDOMContentLoaded(function() {
+		KTUtil.onDOMContentLoaded(function () {
 			tableTopics.init();
 		});
 
@@ -198,7 +198,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 				type: 'GET',
 				url: './actions/topics_add.php',
 				dataType: 'HTML',
-				success: function(result_html) {
+				success: function (result_html) {
 					$('#topic_manage_form').html(result_html);
 					$('#topicManageModal').modal('show');
 				}
@@ -211,7 +211,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 
 			let choicesArr = [];
 			let choicesInvalidArr = [];
-			$('[data-repeater-item]').each(function(key, val) {
+			$('[data-repeater-item]').each(function (key, val) {
 				let sort = $(this).attr('data-choice-sort');
 				let title = $(this).find('[data-choice-title]');
 				if (title.val().length == 0) {
@@ -257,9 +257,12 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 					data: {
 						topicTitle: $('#topicTitle').val(),
 						expireDateTime: $('#expireDateTime').val(),
-						choicesArr: choicesArr
+						choicesArr: choicesArr,
+						displayMode: $('input[name="displayMode"]:checked').val(),
+						showScore: $('#showScore').is(':checked') ? 1 : 0,
+						isPublic: $('#isPublic').is(':checked') ? 1 : 0
 					},
-					success: function(data) {
+					success: function (data) {
 						$('#topicManageModal').modal('hide');
 						$('#topicsTable').DataTable().ajax.reload();
 					}
@@ -278,7 +281,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 				data: {
 					topic_id: topic_id,
 				},
-				success: function(result_html) {
+				success: function (result_html) {
 					$('#topic_manage_form').html(result_html);
 					$('#topicManageModal').modal('show');
 				}
@@ -293,7 +296,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 			let choicesNewArr = [];
 			let choicesAllArr = [];
 			let choicesInvalidArr = [];
-			$('[data-repeater-item]').each(function(key, val) {
+			$('[data-repeater-item]').each(function (key, val) {
 				let cid = $(this).attr('data-choice-id');
 				let sort = $(this).attr('data-choice-sort');
 				let title = $(this).find('[data-choice-title]');
@@ -352,9 +355,12 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 						topicTitle: $('#topicTitle').val(),
 						expireDateTime: $('#expireDateTime').val(),
 						choicesCurrentArr: choicesCurrentArr,
-						choicesNewArr: choicesNewArr
+						choicesNewArr: choicesNewArr,
+						displayMode: $('input[name="displayMode"]:checked').val(),
+						showScore: $('#showScore').is(':checked') ? 1 : 0,
+						isPublic: $('#isPublic').is(':checked') ? 1 : 0
 					},
-					success: function(data) {
+					success: function (data) {
 						$('#topicManageModal').modal('hide');
 						$('#topicsTable').DataTable().ajax.reload();
 					}
@@ -370,7 +376,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 				data: {
 					topic_id: topic_id,
 				},
-				success: function(result_html) {
+				success: function (result_html) {
 					$('#qrModal * .modal-body').html(result_html);
 					$('#qrModal').modal('show');
 				}
@@ -389,7 +395,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 					confirmButton: "btn fw-bold btn-danger",
 					cancelButton: "btn fw-bold btn-active-light-primary"
 				}
-			}).then(function(result) {
+			}).then(function (result) {
 				if (result.value) {
 
 					$.ajax({
@@ -399,7 +405,7 @@ if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
 							topic_id: topic_id,
 						},
 						dataType: 'JSON',
-						success: function(result) {
+						success: function (result) {
 							if (result.status === 'success') {
 								$('#topicsTable').DataTable().ajax.reload();
 								Swal.fire({

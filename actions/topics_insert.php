@@ -14,13 +14,19 @@ $vote_conn = $connections['vote'];
 $topic_title = $_POST['topicTitle'];
 $expire_datetime = $_POST['expireDateTime'];
 $choices_arr = $_POST['choicesArr'];
+$display_mode = isset($_POST['displayMode']) ? $_POST['displayMode'] : 'card';
+$show_score = (isset($_POST['showScore']) && $_POST['showScore'] == 1) ? 1 : 0;
+$is_public = (isset($_POST['isPublic']) && $_POST['isPublic'] == 1) ? 1 : 0;
 
 $response = [];
 $topic_datas = [
     'topic_title' => $topic_title,
     'expire_datetime' => $expire_datetime,
     'member_id' => $_SESSION['user_id'],
-    'share_key' => generateTopicKey(16)
+    'share_key' => generateTopicKey(16),
+    'display_mode' => $display_mode,
+    'show_score' => $show_score,
+    'is_public' => $is_public
 ];
 $topic_sql = arrayToInsertSQL('vote_topics', $topic_datas);
 

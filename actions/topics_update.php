@@ -14,6 +14,9 @@ $vote_conn = $connections['vote'];
 $topic_id = $_POST['topic_id'];
 $topic_title = $_POST['topicTitle'];
 $expire_datetime = $_POST['expireDateTime'];
+$display_mode = isset($_POST['displayMode']) ? $_POST['displayMode'] : 'card';
+$show_score = (isset($_POST['showScore']) && $_POST['showScore'] == 1) ? 1 : 0;
+$is_public = (isset($_POST['isPublic']) && $_POST['isPublic'] == 1) ? 1 : 0;
 $choices_current_arr = isset($_POST['choicesCurrentArr']) ? $_POST['choicesCurrentArr'] : [];
 $choices_new_arr = isset($_POST['choicesNewArr']) ? $_POST['choicesNewArr'] : [];
 
@@ -24,6 +27,9 @@ $query_success = [];
 $topic_datas = [
     'topic_title' => $topic_title,
     'expire_datetime' => $expire_datetime,
+    'display_mode' => $display_mode,
+    'show_score' => $show_score,
+    'is_public' => $is_public,
 ];
 $topic_sql = arrayToUpdateSQL('vote_topics', $topic_datas, ['id' => $topic_id]);
 if ($vote_conn->query($topic_sql)) {
@@ -46,7 +52,7 @@ if (count($choices_current_arr) > 0) {
         $delete_not_ids[] = $cr_val['id'];
     }
     if (count($choice_upd_sql) > 0) {
-        if ($vote_conn->multi_query(implode('',$choice_upd_sql))) {
+        if ($vote_conn->multi_query(implode('', $choice_upd_sql))) {
             do {
             } while ($vote_conn->next_result());
             $query_success[] = ['status' => true, 'message' => 'Choices updated successfully.'];
@@ -99,7 +105,7 @@ if (!in_array(false, $query_statuses)) {
     $response['message'] = 'ALL updated successfully';
 } else {
     $response['status'] = 'error';
-    $response['message'] = 'Error: '.implode(', ',$query_messages);
+    $response['message'] = 'Error: ' . implode(', ', $query_messages);
 }
 
 echo json_encode($response);
