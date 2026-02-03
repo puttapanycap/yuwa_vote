@@ -19,6 +19,30 @@ $show_score = (isset($_POST['showScore']) && $_POST['showScore'] == 1) ? 1 : 0;
 $is_public = (isset($_POST['isPublic']) && $_POST['isPublic'] == 1) ? 1 : 0;
 $choices_current_arr = isset($_POST['choicesCurrentArr']) ? $_POST['choicesCurrentArr'] : [];
 $choices_new_arr = isset($_POST['choicesNewArr']) ? $_POST['choicesNewArr'] : [];
+$session_key = isset($_POST['session_key']) ? $_POST['session_key'] : '';
+
+// Validate session key
+if (empty($session_key) || !isValidSessionKey($session_key)) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Invalid session key'
+    ]);
+    exit;
+}
+
+// Verify topic belongs to this session
+$verify_sql = "SELECT id FROM vote_topics WHERE id='$topic_id' AND session_key='$session_key'";
+$verify_query = $vote_conn->query($verify_sql);
+if ($verify_query->num_rows === 0) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'ไม่มีสิทธิ์แก้ไข Topic นี้'
+    ]);
+    exit;
+}
+
+$vote_mode = isset($_POST['voteMode']) ? $_POST['voteMode'] : 'single';
+$max_choices = isset($_POST['maxChoices']) ? intval($_POST['maxChoices']) : 1;
 
 $response = [];
 $delete_not_ids = [];
@@ -30,6 +54,8 @@ $topic_datas = [
     'display_mode' => $display_mode,
     'show_score' => $show_score,
     'is_public' => $is_public,
+    'vote_mode' => $vote_mode,
+    'max_choices' => $max_choices,
 ];
 $topic_sql = arrayToUpdateSQL('vote_topics', $topic_datas, ['id' => $topic_id]);
 if ($vote_conn->query($topic_sql)) {

@@ -18,15 +18,29 @@ $display_mode = isset($_POST['displayMode']) ? $_POST['displayMode'] : 'card';
 $show_score = (isset($_POST['showScore']) && $_POST['showScore'] == 1) ? 1 : 0;
 $is_public = (isset($_POST['isPublic']) && $_POST['isPublic'] == 1) ? 1 : 0;
 
+// Get session key from POST
+$session_key = isset($_POST['session_key']) ? $_POST['session_key'] : '';
+
+// Validate session key
+if (empty($session_key) || !isValidSessionKey($session_key)) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Invalid session key'
+    ]);
+    exit;
+}
+
 $response = [];
 $topic_datas = [
     'topic_title' => $topic_title,
     'expire_datetime' => $expire_datetime,
-    'member_id' => $_SESSION['user_id'],
+    'session_key' => $session_key,
     'share_key' => generateTopicKey(16),
     'display_mode' => $display_mode,
     'show_score' => $show_score,
-    'is_public' => $is_public
+    'is_public' => $is_public,
+    'vote_mode' => isset($_POST['voteMode']) ? $_POST['voteMode'] : 'single',
+    'max_choices' => isset($_POST['maxChoices']) ? intval($_POST['maxChoices']) : 1
 ];
 $topic_sql = arrayToInsertSQL('vote_topics', $topic_datas);
 

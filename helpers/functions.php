@@ -307,3 +307,78 @@ function isHasMember($sess_id, $sess_username) {
     $query = $vote_conn->query($sql);
     return $query->num_rows > 0 ? true : false ;
 }
+
+// ============================================
+// Session-Based Access Functions
+// ============================================
+
+/**
+ * Generate a unique workspace session key
+ * @param int $length Length of the key (default 32 characters)
+ * @return string Hexadecimal session key
+ */
+function generateWorkspaceSessionKey($length = 32) {
+    return bin2hex(random_bytes($length / 2));
+}
+
+/**
+ * Validate session key format
+ * @param string $key Session key to validate
+ * @return bool True if valid format
+ */
+function isValidSessionKey($key) {
+    return preg_match('/^[a-f0-9]{32}$/i', $key);
+}
+
+/**
+ * Get or create a workspace session
+ * If no valid session key provided, generates a new one
+ * @param mysqli $conn Database connection
+ * @param string|null $sessionKey Existing session key or null
+ * @return array Session info with key and whether it's new
+ */
+function getOrCreateWorkspaceSession($conn, $sessionKey = null) {
+    // If valid session key provided, check if it exists
+    if ($sessionKey && isValidSessionKey($sessionKey)) {
+        $stmt = $conn->prepare("SELECT session_key FROM vote_topics WHERE session_key = ? LIMIT 1");
+        $stmt->bind_param("s", $sessionKey);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        // Even if no topics exist with this key, it's still valid
+        // (user might have a new workspace with no topics yet)
+        return [
+            'session_key' => $sessionKey,
+            'is_new' => false,
+            'valid' => true
+        ];
+    }
+    
+    // Generate new session key
+    $newKey = generateWorkspaceSessionKey();
+    return [
+        'session_key' => $newKey,
+        'is_new' => true,
+        'valid' => true
+    ];
+}
+
+/**
+ * Get the current page's base URL
+ * @return string Base URL
+ */
+function getBaseUrl() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $path = dirname($_SERVER['PHP_SELF']);
+    return rtrim($protocol . '://' . $host . $path, '/');
+}
+
+/**
+ * Generate a shareable workspace link
+ * @param string $sessionKey The session key
+ * @return string Full URL to share
+ */
+function generateShareableLink($sessionKey) {
+    return getBaseUrl() . '/?key=' . urlencode($sessionKey);
+}

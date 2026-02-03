@@ -21,7 +21,9 @@ $topic_sql = "  SELECT
                     topic_title,
                     expire_datetime,
                     member_id,
-                    share_key
+                    share_key,
+                    COALESCE(vote_mode, 'single') as vote_mode,
+                    COALESCE(max_choices, 1) as max_choices
                 FROM
                     vote_topics 
 				WHERE
@@ -30,6 +32,8 @@ $topic_query = $vote_conn->query($topic_sql);
 $topic_info = $topic_query->fetch_assoc();
 $topic_id = $topic_info['id'];
 $topic_title = $topic_info['topic_title'];
+$vote_mode = $topic_info['vote_mode'];
+$max_choices = intval($topic_info['max_choices']);
 
 $topic_expire = new DateTime($topic_info['expire_datetime']);
 $today = new DateTime(date("Y-m-d H:i:s"));
@@ -285,6 +289,12 @@ while ($choice_row = $choices_query->fetch_assoc()) {
                     <!-- Voting Interface -->
                     <div class="text-center mb-4">
                         <div class="fs-2x fw-bold text-gray-800 mb-2">เลือกลงคะแนน</div>
+                        <?php if ($vote_mode == 'multiple'): ?>
+                        <div class="badge bg-warning text-dark fs-6 mb-2">
+                            <i class="fa-solid fa-check-double me-1"></i>
+                            เลือกได้สูงสุด <?php echo $max_choices ?> ตัวเลือก
+                        </div>
+                        <?php endif; ?>
                         <div class="countdown-container" id="countdown"></div>
                     </div>
 
@@ -293,7 +303,11 @@ while ($choice_row = $choices_query->fetch_assoc()) {
                         $i = 0;
                         foreach ($choices as $cc):
                             ?>
+                            <?php if ($vote_mode == 'single'): ?>
                             <input type="radio" class="btn-check" name="choice_for_vote" value="<?php echo $cc['id'] ?>" <?php echo $i == 0 ? 'checked' : ''; ?> id="choice_<?php echo $cc['id'] ?>" />
+                            <?php else: ?>
+                            <input type="checkbox" class="btn-check choice-checkbox" name="choice_for_vote[]" value="<?php echo $cc['id'] ?>" id="choice_<?php echo $cc['id'] ?>" />
+                            <?php endif; ?>
                             <label class="choice-label" for="choice_<?php echo $cc['id'] ?>">
                                 <div class="choice-inner d-flex flex-column align-items-center gap-2">
                                     <i class="ki-solid ki-star fs-3x star-icon"></i>
@@ -325,10 +339,58 @@ while ($choice_row = $choices_query->fetch_assoc()) {
     <script>
         countdown('<?php echo $topic_info['expire_datetime'] ?>');
 
+        // Vote mode configuration
+        const VOTE_MODE = '<?php echo $vote_mode ?>';
+        const MAX_CHOICES = <?php echo $max_choices ?>;
+
+        // Limit checkbox selections for multiple choice mode
+        if (VOTE_MODE === 'multiple') {
+            $(document).on('change', '.choice-checkbox', function() {
+                const checkedCount = $('.choice-checkbox:checked').length;
+                if (checkedCount > MAX_CHOICES) {
+                    $(this).prop('checked', false);
+                    Swal.fire({
+                        text: `คุณสามารถเลือกได้สูงสุด ${MAX_CHOICES} ตัวเลือกเท่านั้น`,
+                        icon: "warning",
+                        buttonsStyling: false,
+                        confirmButtonText: "ตกลง",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                }
+            });
+        }
+
         function sendVote() {
+            // Get selected choices based on vote mode
+            let selectedChoices = [];
+            if (VOTE_MODE === 'single') {
+                const selected = $('input[name="choice_for_vote"]:checked').val();
+                if (selected) selectedChoices.push(selected);
+            } else {
+                $('.choice-checkbox:checked').each(function() {
+                    selectedChoices.push($(this).val());
+                });
+            }
+
+            // Validation
+            if (selectedChoices.length === 0) {
+                Swal.fire({
+                    text: 'กรุณาเลือกอย่างน้อย 1 ตัวเลือก',
+                    icon: "warning",
+                    buttonsStyling: false,
+                    confirmButtonText: "ตกลง",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                    }
+                });
+                return;
+            }
+
             Swal.fire({
                 title: 'ยืนยันการโหวต',
-                text: "คุณต้องการส่งผลโหวตใช่หรือไม่",
+                text: `คุณเลือก ${selectedChoices.length} ตัวเลือก ต้องการส่งผลโหวตใช่หรือไม่`,
                 icon: "question",
                 showCancelButton: true,
                 buttonsStyling: false,
@@ -345,7 +407,8 @@ while ($choice_row = $choices_query->fetch_assoc()) {
                         type: 'POST',
                         data: {
                             topic_id: '<?php echo $topic_id ?>',
-                            choice_id: $('input[name="choice_for_vote"]:checked').val(),
+                            choice_ids: selectedChoices,
+                            vote_mode: VOTE_MODE
                         },
                         dataType: 'JSON',
                         success: function (result) {

@@ -40,19 +40,6 @@ if (!$topic_info) {
 
 $is_public = $topic_info['is_public'];
 
-// If topic is not public, require login
-if (!$is_public) {
-	if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_name'])) {
-		header('location: ' . _WEBROOT_PATH_ . 'login.php');
-		exit(0);
-	}
-
-	if (!isHasMember($_SESSION['user_id'], $_SESSION['user_name'])) {
-		header('location: ' . _WEBROOT_PATH_ . 'login.php');
-		exit(0);
-	}
-}
-
 $topic_id = $topic_info['id'];
 $show_score = $topic_info['show_score'];
 $display_mode = $topic_info['display_mode'];
@@ -244,12 +231,6 @@ $vote_conn->close();
 		document.documentElement.setAttribute("data-bs-theme", "light");
 	</script>
 
-	<?php
-	// Only show navbar for logged-in users
-	if (isset($_SESSION['user_id']) && isset($_SESSION['user_name'])):
-		require _WEBROOT_PATH_ . '/components/navbar.php';
-	endif;
-	?>
 
 	<div class="container flex-column-fluid my-4">
 

@@ -26,18 +26,30 @@ $hip_columns = ['expire_datetime', 'topic_title', null];
 $hip_order_by = $hip_columns[$orderableIndexes];
 // Parameters Setup :: END
 
-$member_id = $_SESSION['user_id'];
+// Get session key from POST or SESSION
+$session_key = isset($_POST['session_key']) ? $_POST['session_key'] : (isset($_SESSION['workspace_key']) ? $_SESSION['workspace_key'] : '');
+
+// Validate session key
+if (empty($session_key) || !isValidSessionKey($session_key)) {
+    echo json_encode([
+        "draw" => $draw,
+        "recordsTotal" => 0,
+        "recordsFiltered" => 0,
+        "data" => []
+    ]);
+    exit;
+}
 
 $topic_sql = "  SELECT
                     id,
                     topic_title,
                     expire_datetime,
-                    member_id,
+                    session_key,
                     share_key
                 FROM
                     vote_topics 
                 WHERE
-                    member_id = '$member_id' ";
+                    session_key = '$session_key' ";
 $topic_query = $vote_conn->query($topic_sql);
 $total_all = $topic_query->num_rows;
 
